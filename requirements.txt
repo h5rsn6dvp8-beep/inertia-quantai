@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+yfinance
+numpy
+pandas
+tiktoken
+python-dotenv
+google-genai
+langchain-huggingface
+langchain-community
+chromadb
+sentence-transformers
+beautifulsoup4
+requests

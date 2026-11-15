@@ -1,0 +1,108 @@
+import json
+import time
+from qa_chain import ask_sec_filing
+
+# Örnek Altın Test Seti (Bu listeyi 30-50 soruya kolayca genişletebilirsiniz)
+BENCHMARK_DATASET = [
+    {
+        "id": "Q1_FACT",
+        "type": "Bilgi Çıkarımı (In-Context)",
+        "ticker": "NVDA",
+        "question": "How much was the charge associated with H20 excess inventory and purchase obligations in fiscal year 2026?",
+        "expected_keywords": ["4.5 billion", "H20", "10-K"]
+    },
+    {
+        "id": "Q2_FACT",
+        "type": "Bilgi Çıkarımı (In-Context)",
+        "ticker": "NVDA",
+        "question": "By what percentage did revenue from Data Center networking grow?",
+        "expected_keywords": ["142%", "NVLink", "10-K"]
+    },
+    {
+        "id": "Q3_FACT",
+        "type": "Bilgi Çıkarımı (In-Context)",
+        "ticker": "NVDA",
+        "question": "What caused the gross margin decrease in fiscal year 2026?",
+        "expected_keywords": ["Blackwell", "Hopper", "10-K"]
+    },
+    {
+        "id": "Q4_TRAP",
+        "type": "Tuzak / Veri Dışı Soru (Out-of-Context)",
+        "ticker": "NVDA",
+        "question": "What is NVIDIA's projected revenue target for the year 2032 according to the 10-K report?",
+        "expected_keywords": ["yer almamaktadır"]
+    },
+    {
+        "id": "Q5_TRAP",
+        "type": "Tuzak / Veri Dışı Soru (Out-of-Context)",
+        "ticker": "NVDA",
+        "question": "How many shares of Apple stock did Jensen Huang personally buy in 2026?",
+        "expected_keywords": ["yer almamaktadır"]
+    }
+]
+
+def run_benchmark():
+    results = []
+    passed_count = 0
+    hallucination_count = 0
+    trap_total = 0
+
+    print("=== INERTIA QUANT // RAG BENCHMARK BAŞLATILIYOR ===\n")
+
+    for item in BENCHMARK_DATASET:
+        print(f"[{item['id']}] Test ediliyor: {item['question']}")
+        res = ask_sec_filing(item["question"], ticker=item["ticker"], k=5)
+        answer = res["answer"]
+        
+        # Beklenen anahtar kelimelerin yanıtta geçip geçmediğini kontrol et
+        matched = all(kw.lower() in answer.lower() for kw in item["expected_keywords"])
+        
+        if item["type"].startswith("Tuzak"):
+            trap_total += 1
+            if not matched:
+                hallucination_count += 1
+                
+        if matched:
+            passed_count += 1
+            status = "BAŞARILI"
+        else:
+            status = "HATALI / SINIR İHLALİ"
+            
+        print(f" -> Durum: {status} | Süre: {res['telemetry'].get('latency_ms', 0)} ms\n")
+        
+        results.append({
+            "id": item["id"],
+            "type": item["type"],
+            "question": item["question"],
+            "status": status,
+            "answer_preview": answer[:250] + "...",
+            "telemetry": res["telemetry"]
+        })
+        # Ücretsiz API hız limitine (Rate Limit) takılmamak için kısa bekleme
+        time.sleep(2)
+
+    total = len(BENCHMARK_DATASET)
+    accuracy = round((passed_count / total) * 100, 1)
+    hallucination_rate = round((hallucination_count / trap_total) * 100, 1) if trap_total else 0.0
+
+    report = {
+        "summary": {
+            "total_questions": total,
+            "passed": passed_count,
+            "accuracy_percent": accuracy,
+            "hallucination_rate_percent": hallucination_rate
+        },
+        "details": results
+    }
+
+    report_path = r"D:\inertia-quant\data\benchmark_report.json"
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+
+    print("=== BENCHMARK SONUÇ ÖZETİ ===")
+    print(f"Toplam Soru: {total} | Başarılı: {passed_count} | Doğruluk: %{accuracy}")
+    print(f"Tuzak Sorularda Halüsinasyon Oranı: %{hallucination_rate}")
+    print(f"Detaylı rapor kaydedildi: {report_path}")
+
+if __name__ == "__main__":
+    run_benchmark()

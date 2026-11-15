@@ -1,0 +1,282 @@
+{
+  "summary": {
+    "total_questions": 30,
+    "passed": 27,
+    "accuracy_percent": 90.0,
+    "hallucination_rate_percent": 0.0,
+    "avg_latency_ms": 2555.8,
+    "cost_per_query_usd": 0.0
+  },
+  "details": [
+    {
+      "id": "Q01",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "How much was the charge associated with H20 excess inventory and purchase obligations in fiscal year 2026?",
+      "status": "PASS",
+      "latency_ms": 14150.6,
+      "answer_snippet": "2026 mali yılında (fiscal year 2026), H20 fazla envanter (excess inventory) ve satın alma taahhütleri ile ilişkili olan zarar/karşılık tutarı (charge) 4,5 milyar dolar (billion) olarak gerçekleşmiştir [NVDA 10-K | 2026-0..."
+    },
+    {
+      "id": "Q02",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "By what percentage did revenue from Data Center networking grow?",
+      "status": "PASS",
+      "latency_ms": 2167.9,
+      "answer_snippet": "Inertia Quant AI analizi doğrultusunda, Data Center networking gelirindeki (Data Center networking revenue) büyüme oranı şu şekildedir:  Data Center networking geliri, GB200 ve GB300 sistemleri için NVLink compute fabric..."
+    },
+    {
+      "id": "Q03",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "By what percentage did Data Center computing revenue grow?",
+      "status": "PASS",
+      "latency_ms": 1549.8,
+      "answer_snippet": "Verilen SEC raporuna göre, Data Center computing geliri %59 oranında artmıştır [NVDA 10-K | 2026-02-25 | Item 7 - MD&A (Finansal Analiz) | Parça #189].  Doğrudan Rapor Alıntıları (Citations): * \"Revenue from Data Center ..."
+    },
+    {
+      "id": "Q04",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "What caused the gross margin decrease in fiscal year 2026?",
+      "status": "PASS",
+      "latency_ms": 2348.5,
+      "answer_snippet": "Inertia Quant AI olarak sunduğumuz analiz aşağıdadır:  2026 mali yılında (fiscal year 2026), Gross Margin (brüt kâr marjı) oranındaki düşüşün temel sebepleri şunlardır:  1. İş modelinin Hopper HGX sistemlerinden Blackwel..."
+    },
+    {
+      "id": "Q05",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "Which platforms drove Data Center networking growth alongside NVLink?",
+      "status": "PASS",
+      "latency_ms": 1722.7,
+      "answer_snippet": "SEC 10-K raporuna göre, Veri Merkezi ağı (Data Center networking) büyümesi, GB200 ve GB300 sistemleri için NVLink bilgi işlem kumaşının (NVLink compute fabric) sunulması ve yaygınlaştırılmasının yanı sıra Ethernet ve Inf..."
+    },
+    {
+      "id": "Q06",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "Which specific GPU systems used the NVLink compute fabric mentioned in MD&A?",
+      "status": "FAIL",
+      "latency_ms": 1433.3,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır...."
+    },
+    {
+      "id": "Q07",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "What are the major supply chain and manufacturing risks disclosed in Item 1A?",
+      "status": "PASS",
+      "latency_ms": 4709.7,
+      "answer_snippet": "Kantitatif Finans Analisti olarak, sağlanan SEC 10-K raporu içerisindeki (CONTEXT) Item 1A - Risk Factors bölümüne dayanarak tedarik zinciri (supply chain) ve imalat (manufacturing) riskleri şu başlıklar altında özetlenm..."
+    },
+    {
+      "id": "Q08",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "How do export controls and geopolitical restrictions affect NVIDIA's business?",
+      "status": "PASS",
+      "latency_ms": 5151.1,
+      "answer_snippet": "Kantitatif Finans Analisti olarak iletilen SEC 10-K raporu parçalarına dayanarak ihracat kontrollerinin (export controls) ve jeopolitik kısıtlamaların NVIDIA'nın iş hacmine etkileri şu şekildedir:  * **İş Sonuçları ve Fi..."
+    },
+    {
+      "id": "Q09",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "What role does Research and Development play in NVIDIA's competitive strategy?",
+      "status": "PASS",
+      "latency_ms": 2804.5,
+      "answer_snippet": "NVIDIA'nın rekabet stratejisinde Araştırma ve Geliştirme (Research and Development), şirketin platform yaklaşımını desteklemede ve kaldıraçlı yatırımlar (leveraged investments in research and development) yapmasında krit..."
+    },
+    {
+      "id": "Q10",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "How does NVIDIA describe its transition from Hopper HGX systems?",
+      "status": "FAIL",
+      "latency_ms": 1521.0,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır.  Doğrudan Rapor Alıntıları (Citations): Bu soruya yanıt verebilecek nitelikte doğrudan bir alıntı seçili SEC raporu parçalarında bulunmamaktadır...."
+    },
+    {
+      "id": "Q11",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "What are the primary market segments served by NVIDIA according to Item 1?",
+      "status": "PASS",
+      "latency_ms": 1831.4,
+      "answer_snippet": "NVIDIA'nın Item 1'e göre hizmet verdiği dört büyük pazar (markets) şunlardır: 1. Data Center [NVDA 10-K | 2026-02-25 | Item 1 - Business | Parça #18] 2. Gaming [NVDA 10-K | 2026-02-25 | Item 1 - Business | Parça #18] 3. ..."
+    },
+    {
+      "id": "Q12",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "What risks does NVIDIA face regarding third-party foundries and packaging?",
+      "status": "PASS",
+      "latency_ms": 1799.4,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır.  Doğrudan Rapor Alıntıları (Citations) Bu soruya doğrudan yanıt verebilecek nitelikte bir alıntı, sağlanan SEC 10-K raporu parçalarında bulunmamaktadır...."
+    },
+    {
+      "id": "Q13",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "How does macroeconomic volatility impact demand for NVIDIA products?",
+      "status": "PASS",
+      "latency_ms": 3401.0,
+      "answer_snippet": "Verilen SEC 10-K raporu parçalarında \"makroekonomik volatilite\" (macroeconomic volatility) ifadesi doğrudan geçmemektedir. Ancak, sağlanan metinlerde ürünlerimize yönelik talebi ve talep tahminlemesini etkileyen belirli ..."
+    },
+    {
+      "id": "Q14",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "What intellectual property and cybersecurity risks are outlined in the 10-K?",
+      "status": "PASS",
+      "latency_ms": 3946.9,
+      "answer_snippet": "Verilen SEC 10-K raporuna göre, fikri mülkiyet (Intellectual Property - IP) ve siber güvenlik (cybersecurity) ile ilgili belirtilen riskler şunlardır:  **Fikri Mülkiyet (Intellectual Property - IP) Riskleri:** * Fikri mü..."
+    },
+    {
+      "id": "Q15",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "What is NVIDIA's liquidity and cash flow management overview in Item 7?",
+      "status": "FAIL",
+      "latency_ms": 1479.4,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır.  Doğrudan Rapor Alıntıları (Citations)..."
+    },
+    {
+      "id": "Q16",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "In which quarter of fiscal year 2026 did the H20 inventory charge occur?",
+      "status": "PASS",
+      "latency_ms": 1935.6,
+      "answer_snippet": "Kantitatif Finans Analisti olarak size sağlanan SEC 10-K raporu verileri doğrultusunda yanıtım şöyledir:  H20 ürünleri ve aşırı envanter (excess inventory) ile satın alma yükümlülüklerine (purchase obligations) ilişkin 4..."
+    },
+    {
+      "id": "Q17",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "What software platforms complement NVIDIA's accelerated computing hardware?",
+      "status": "PASS",
+      "latency_ms": 2440.4,
+      "answer_snippet": "NVIDIA'nın hızlandırılmış bilişim donanımını (accelerated computing hardware) tamamlayan yazılım platformları ve bileşenleri arasında CUDA geliştirme platformu (CUDA development platform), CUDA-X hızlandırma kütüphaneler..."
+    },
+    {
+      "id": "Q18",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "How does competition in the AI semiconductor market affect pricing and margins?",
+      "status": "PASS",
+      "latency_ms": 2223.6,
+      "answer_snippet": "İnertia Quant AI olarak sağlanan SEC 10-K raporu parçalarına dayanarak sorunuzu yanıtlıyorum:  Rapora göre, rakiplerin ürünlerinin daha ucuz olması, daha iyi işlevsellik veya özellikler sunması geçmişte daha düşük satış ..."
+    },
+    {
+      "id": "Q19",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "What regulatory compliance challenges are disclosed in Item 1A Risk Factors?",
+      "status": "PASS",
+      "latency_ms": 1931.4,
+      "answer_snippet": "Verilen SEC 10-K raporu parçalarına göre, Item 1A Risk Factors bölümünde açıklanan regülasyon uyum zorlukları ve ilgili riskler şunlardır:  Şirket, ürünlerimizin ihracatına yönelik kısıtlamalar dahil olmak üzere, karmaşı..."
+    },
+    {
+      "id": "Q20",
+      "type": "In-Context",
+      "ticker": "NVDA",
+      "question": "What are the key drivers of operating expenses in fiscal year 2026?",
+      "status": "PASS",
+      "latency_ms": 2479.2,
+      "answer_snippet": "Verilen SEC raporuna göre, 2026 mali yılında (fiscal year 2026) faaliyet giderlerindeki (Operating expenses) artışın temel sürücüleri (key drivers) şunlardır:  * Satış, genel ve idari giderlerdeki (sales, general and adm..."
+    },
+    {
+      "id": "Q21_TRAP",
+      "type": "Trap",
+      "ticker": "NVDA",
+      "question": "What is NVIDIA's projected revenue target for the year 2035 according to the 10-K?",
+      "status": "PASS",
+      "latency_ms": 1433.9,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır.  Doğrudan Rapor Alıntıları (Citations): (Bulunmamaktadır)..."
+    },
+    {
+      "id": "Q22_TRAP",
+      "type": "Trap",
+      "ticker": "NVDA",
+      "question": "How many shares of Apple stock did Jensen Huang personally purchase in 2026?",
+      "status": "PASS",
+      "latency_ms": 1313.9,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır...."
+    },
+    {
+      "id": "Q23_TRAP",
+      "type": "Trap",
+      "ticker": "NVDA",
+      "question": "What is the exact budget allocated for NVIDIA's Mars colony data center?",
+      "status": "PASS",
+      "latency_ms": 1494.7,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır.  Doğrudan Rapor Alıntıları (Citations): Bu soruya yanıt verebilecek ilgili bir ifade veya bütçe verisi sağlanan SEC 10-K raporu parçalarında bulunmamaktadır...."
+    },
+    {
+      "id": "Q24_TRAP",
+      "type": "Trap",
+      "ticker": "NVDA",
+      "question": "What was the closing price of Bitcoin on the day the 10-K was signed?",
+      "status": "PASS",
+      "latency_ms": 1432.5,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır.  Doğrudan Rapor Alıntıları (Citations) \"Bu bilgi seçili SEC raporunda yer almamaktadır.\"..."
+    },
+    {
+      "id": "Q25_TRAP",
+      "type": "Trap",
+      "ticker": "NVDA",
+      "question": "Which Formula 1 team did NVIDIA sponsor in 2026 according to Item 7?",
+      "status": "PASS",
+      "latency_ms": 1394.4,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır...."
+    },
+    {
+      "id": "Q26_TRAP",
+      "type": "Trap",
+      "ticker": "NVDA",
+      "question": "What is the secret recipe used in the Santa Clara headquarters cafeteria?",
+      "status": "PASS",
+      "latency_ms": 1881.0,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır.  Doğrudan Rapor Alıntıları (Citations): Bu soruya yanıt verebilecek nitelikte bir alıntı SEC raporunun sağlanan bölümlerinde bulunmamaktadır...."
+    },
+    {
+      "id": "Q27_TRAP",
+      "type": "Trap",
+      "ticker": "NVDA",
+      "question": "How many employees own electric scooters according to the 10-K filing?",
+      "status": "PASS",
+      "latency_ms": 1775.6,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır...."
+    },
+    {
+      "id": "Q28_TRAP",
+      "type": "Trap",
+      "ticker": "NVDA",
+      "question": "What is NVIDIA's target dividend yield for fiscal year 2040?",
+      "status": "PASS",
+      "latency_ms": 1983.4,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır...."
+    },
+    {
+      "id": "Q29_TRAP",
+      "type": "Trap",
+      "ticker": "NVDA",
+      "question": "Who won the UEFA Champions League final mentioned in Item 1A?",
+      "status": "PASS",
+      "latency_ms": 1591.9,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır.  Doğrudan Rapor Alıntıları (Citations): Bu soruya yanıt verebilecek ilgili metin veya alıntı verilen SEC raporu parçalarında (CONTEXT) bulunmamaktadır...."
+    },
+    {
+      "id": "Q30_TRAP",
+      "type": "Trap",
+      "ticker": "NVDA",
+      "question": "What is the exact serial number of the first Blackwell chip shipped?",
+      "status": "PASS",
+      "latency_ms": 1345.4,
+      "answer_snippet": "Bu bilgi seçili SEC raporunda yer almamaktadır...."
+    }
+  ]
+}
