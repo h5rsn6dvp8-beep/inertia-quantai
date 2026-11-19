@@ -1,0 +1,1250 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INERTIA QUANT // Kurumsal Kantitatif & Finansal Terminal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230B0D11'/><text x='16' y='22' font-family='monospace' font-weight='bold' font-size='15' fill='%23FFFFFF' text-anchor='middle'>IQ</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-obsidian: #0B0D11;
+            --dark-slate: #13171F;
+            --dark-border: rgba(255, 255, 255, 0.1);
+            --light-canvas: #F3F5F8;
+            --light-card: #FFFFFF;
+            --light-subtle: #EAEFF5;
+            --light-border: #DCE2EC;
+            --ink-primary: #0F172A;
+            --ink-secondary: #475569;
+            --ink-muted: #64748B;
+            --accent-emerald: #059669;
+            --accent-emerald-bg: #ECFDF5;
+            --accent-crimson: #DC2626;
+            --accent-crimson-bg: #FEF2F2;
+            --accent-amber: #D97706;
+            --accent-amber-bg: #FFFBEB;
+            --radius: 8px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--light-canvas);
+            color: var(--ink-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .mono { font-family: 'IBM Plex Mono', monospace; }
+
+        .top-ticker {
+            background: var(--dark-obsidian);
+            color: #F8FAFC;
+            height: 38px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--dark-border);
+            font-size: 0.74rem;
+            gap: 16px;
+        }
+        .ticker-track {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+        }
+        .ticker-track::-webkit-scrollbar { display: none; }
+        .t-item { display: inline-flex; align-items: center; gap: 6px; color: #CBD5E1; }
+        .t-item b { color: #FFFFFF; font-weight: 600; }
+        .up-txt { color: #34D399; font-weight: 600; }
+        .down-txt { color: #F87171; font-weight: 600; }
+
+        .regime-tag {
+            background: var(--dark-slate);
+            border: 1px solid var(--dark-border);
+            padding: 3px 10px;
+            border-radius: 4px;
+            color: #FBBF24;
+            font-weight: 600;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pulse-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: #10B981;
+            box-shadow: 0 0 8px #10B981;
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            flex: 1;
+        }
+        @media (max-width: 1024px) {
+            .layout-grid { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+        }
+
+        .sidebar {
+            background: var(--dark-obsidian);
+            color: #F8FAFC;
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid var(--dark-border);
+        }
+        .brand-box {
+            padding: 0 10px 16px 10px;
+            border-bottom: 1px solid var(--dark-border);
+            margin-bottom: 12px;
+        }
+        .brand-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+        .brand-badge {
+            background: #FFFFFF;
+            color: var(--dark-obsidian);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+        .brand-desc { font-size: 0.67rem; color: #94A3B8; margin-top: 5px; }
+
+        .nav-group-title {
+            font-size: 0.62rem;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 1.1px;
+            padding: 0 10px;
+            margin: 12px 0 5px 0;
+        }
+        .nav-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid transparent;
+            color: #CBD5E1;
+            padding: 9px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 3px;
+            transition: all 0.15s ease;
+        }
+        .nav-btn:hover { background: var(--dark-slate); color: #FFFFFF; }
+        .nav-btn.active { background: #FFFFFF; color: var(--dark-obsidian); font-weight: 700; }
+        .nav-num { font-size: 0.65rem; opacity: 0.65; }
+
+        .sidebar-bottom {
+            border-top: 1px solid var(--dark-border);
+            padding-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .lang-switcher {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: var(--dark-slate);
+            padding: 3px;
+            border-radius: 6px;
+            border: 1px solid var(--dark-border);
+        }
+        .lang-opt {
+            background: transparent;
+            border: none;
+            color: #94A3B8;
+            padding: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .lang-opt.active { background: #FFFFFF; color: var(--dark-obsidian); }
+
+        .workspace {
+            padding: 24px 30px;
+            max-width: 1580px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .page-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid var(--light-border);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .page-title { font-size: 1.32rem; font-weight: 800; color: var(--ink-primary); letter-spacing: -0.4px; }
+        .page-sub { font-size: 0.83rem; color: var(--ink-secondary); margin-top: 3px; }
+
+        .tab-section { display: none; }
+        .tab-section.active { display: block; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .control-strip {
+            background: var(--light-card);
+            border: 1px solid var(--light-border);
+            border-radius: var(--radius);
+            padding: 15px 18px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+        .input-col { display: flex; flex-direction: column; gap: 5px; }
+        .input-lbl { font-size: 0.67rem; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+        input, select, textarea {
+            background: var(--light-canvas);
+            border: 1px solid #CBD5E1;
+            color: var(--ink-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.83rem;
+            font-weight: 500;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--dark-obsidian); background: #FFFFFF; }
+
+        .btn-dark {
+            background: var(--dark-obsidian);
+            color: #FFFFFF;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.76rem;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+        }
+        .btn-dark:hover { background: #1E293B; }
+
+        .btn-outline {
+            background: #FFFFFF;
+            color: var(--ink-primary);
+            border: 1px solid #CBD5E1;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.76rem;
+            cursor: pointer;
+        }
+        .btn-outline:hover { border-color: var(--dark-obsidian); background: var(--light-canvas); }
+
+        .white-card {
+            background: var(--light-card);
+            border: 1px solid var(--light-border);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+        }
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--light-subtle);
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--ink-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .market-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .m-card {
+            background: var(--light-card);
+            border: 1px solid var(--light-border);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s;
+        }
+        .m-card:hover { transform: translateY(-2px); border-color: var(--dark-obsidian); }
+        .m-card-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.71rem; font-weight: 700; color: var(--ink-muted); margin-bottom: 5px; }
+        .m-cat { background: var(--light-subtle); padding: 1px 6px; border-radius: 3px; font-size: 0.62rem; }
+        .m-price { font-size: 1.25rem; font-weight: 700; color: var(--ink-primary); }
+        .m-chg-pos { font-size: 0.74rem; font-weight: 700; color: var(--accent-emerald); margin-top: 3px; }
+        .m-chg-neg { font-size: 0.74rem; font-weight: 700; color: var(--accent-crimson); margin-top: 3px; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 18px; }
+        .kpi-lbl { font-size: 0.69rem; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .kpi-val { font-size: 1.44rem; font-weight: 800; color: var(--ink-primary); }
+        .kpi-sub { font-size: 0.75rem; color: var(--ink-secondary); margin-top: 4px; }
+
+        .grid-2 { display: grid; grid-template-columns: 1.35fr 1fr; gap: 18px; }
+        .grid-calc { display: grid; grid-template-columns: repeat(auto-fit, minmax(430px, 1fr)); gap: 18px; }
+        @media (max-width: 1080px) { .grid-2, .grid-calc { grid-template-columns: 1fr; } }
+
+        .calc-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .calc-summary {
+            background: var(--light-canvas);
+            border-left: 4px solid var(--dark-obsidian);
+            padding: 11px 14px;
+            border-radius: 4px;
+            font-size: 0.81rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: var(--ink-secondary);
+        }
+        .calc-summary strong { color: var(--ink-primary); }
+        .calc-chart-wrap { height: 170px; position: relative; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.79rem; }
+        th { text-align: left; padding: 9px 10px; background: var(--light-canvas); color: var(--ink-muted); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--light-border); }
+        td { padding: 9px 10px; border-bottom: 1px solid var(--light-subtle); }
+
+        .pill-buy { background: var(--accent-emerald-bg); color: var(--accent-emerald); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.69rem; }
+        .pill-sell { background: var(--accent-crimson-bg); color: var(--accent-crimson); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.69rem; }
+        .pill-neu { background: var(--accent-amber-bg); color: var(--accent-amber); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.69rem; }
+
+        .ai-box {
+            background: var(--dark-obsidian);
+            color: #F1F5F9;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 0.87rem;
+            line-height: 1.75;
+            white-space: pre-wrap;
+            margin-top: 14px;
+        }
+
+        @media print {
+            .sidebar, .top-ticker, .control-strip, .btn-dark, .btn-outline { display: none !important; }
+            .layout-grid { display: block; }
+            body { background: #FFF; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="top-ticker mono">
+        <div class="ticker-track" id="topTape">
+            <span class="t-item"><span class="pulse-dot"></span><b>INERTIA QUANT</b> Piyasa verileri bağlanıyor...</span>
+        </div>
+        <div class="regime-tag">
+            <span class="pulse-dot"></span>
+            <span id="regimeText">VIX: YÜKLENİYOR</span>
+        </div>
+    </header>
+
+    <div class="layout-grid">
+        <aside class="sidebar">
+            <div>
+                <div class="brand-box">
+                    <div class="brand-title mono"><span class="brand-badge">IQ</span> INERTIA QUANT</div>
+                    <div class="brand-desc mono" id="ui_brand_sub">KURUMSAL KANTİTATİF TERMİNAL</div>
+                </div>
+
+                <div class="nav-group-title mono" id="ui_grp1">CANLI PİYASA & PORTFÖY</div>
+                <button class="nav-btn active" onclick="openTab('tab-markets', this)" id="nav_1"><span>01. TR & Global Piyasalar</span><span class="nav-num mono">LIVE</span></button>
+                <button class="nav-btn" onclick="openTab('tab-portfolio', this)" id="nav_2"><span>02. Portföyüm & Alarm</span><span class="nav-num mono">TRY/USD</span></button>
+                <button class="nav-btn" onclick="openTab('tab-bot', this)" id="nav_3"><span>03. Algo Trading Botu</span><span class="nav-num mono">BOT</span></button>
+                <button class="nav-btn" onclick="openTab('tab-screener', this)" id="nav_4"><span>04. Sinyal Tarayıcı</span><span class="nav-num mono">RSI</span></button>
+
+                <div class="nav-group-title mono" id="ui_grp2">KANTİTATİF RİSK MOTORU</div>
+                <button class="nav-btn" onclick="openTab('tab-markowitz', this)" id="nav_5"><span>05. Markowitz Optimizasyon</span><span class="nav-num mono">MPT</span></button>
+                <button class="nav-btn" onclick="openTab('tab-backtest', this)" id="nav_6"><span>06. Backtest & VaR Risk</span><span class="nav-num mono">VAR</span></button>
+                <button class="nav-btn" onclick="openTab('tab-montecarlo', this)" id="nav_7"><span>07. Monte Carlo Simülasyon</span><span class="nav-num mono">GBM</span></button>
+
+                <div class="nav-group-title mono" id="ui_grp3">STÜDYO & YAPAY ZEKA</div>
+                <button class="nav-btn" onclick="openTab('tab-calculators', this)" id="nav_8"><span>08. Grafikli Hesap Stüdyosu</span><span class="nav-num mono">6X</span></button>
+                <button class="nav-btn" onclick="openTab('tab-rag', this)" id="nav_9"><span>09. SEC 10-K & KAP AI</span><span class="nav-num mono">RAG</span></button>
+            </div>
+
+            <div class="sidebar-bottom">
+                <button class="btn-outline mono" style="width:100%; font-size:0.72rem;" onclick="exportFullReport()" id="ui_btn_export">RAPOR İNDİR (.MD)</button>
+                <div style="font-size:0.68rem; color:#94A3B8; padding:0 4px;" class="mono" id="engineStatus">DURUM: BAĞLANIYOR...</div>
+                <div class="lang-switcher mono">
+                    <button class="lang-opt active" onclick="switchLang('tr', this)">TR</button>
+                    <button class="lang-opt" onclick="switchLang('en', this)">EN</button>
+                    <button class="lang-opt" onclick="switchLang('de', this)">DE</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="workspace">
+
+            <!-- 01. CANLI TÜRKİYE & GLOBAL PİYASALAR -->
+            <section id="tab-markets" class="tab-section active">
+                <div class="page-head">
+                    <div>
+                        <h1 class="page-title" id="h_mkt">Canlı Türkiye & Global Piyasalar Kokpiti</h1>
+                        <p class="page-sub" id="s_mkt">Dolar/TL, Euro/TL, Gram Altın, BIST 100, Emtia ve Kripto verileri — Kartlara tıklayarak teknik grafiği inceleyin.</p>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-outline mono" onclick="window.print()" id="ui_btn_pdf">PDF YAZDIR</button>
+                        <button class="btn-dark mono" onclick="loadLiveMarkets(true)" id="ui_btn_ref">VERİLERİ YENİLE</button>
+                    </div>
+                </div>
+
+                <div class="market-cards-grid mono" id="liveMarketCards"></div>
+
+                <div class="control-strip">
+                    <div class="input-col">
+                        <span class="input-lbl">GRAFİK SEMBOLÜ (TRY=X, XU100.IS, THYAO.IS, NVDA, BTC-USD)</span>
+                        <input type="text" id="chartSymbol" class="mono" value="TRY=X" style="width:240px;">
+                    </div>
+                    <div class="input-col">
+                        <span class="input-lbl">ZAMAN ARALIĞI</span>
+                        <select id="chartPeriod" class="mono">
+                            <option value="1mo">1M</option>
+                            <option value="3mo">3M</option>
+                            <option value="6mo" selected>6M</option>
+                            <option value="1y">1Y</option>
+                            <option value="2y">2Y</option>
+                        </select>
+                    </div>
+                    <button class="btn-dark mono" onclick="loadTechChart()">TEKNİK GRAFİĞİ ÇİZ</button>
+                </div>
+
+                <div class="grid-2">
+                    <div class="white-card">
+                        <div class="card-top mono"><span id="techChartTitle">FİYAT & BOLLINGER BANTLARI (20G)</span><span>SMA20 + BB</span></div>
+                        <canvas id="priceTechChart" height="145"></canvas>
+                    </div>
+                    <div class="white-card">
+                        <div class="card-top mono"><span>RSI (14) MOMENTUM</span><span>70 / 30</span></div>
+                        <canvas id="rsiTechChart" height="145"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 02. KİŞİSEL PORTFÖY & ALARM TAKİBİ -->
+            <section id="tab-portfolio" class="tab-section">
+                <div class="page-head">
+                    <div>
+                        <h1 class="page-title" id="h_port">Kişisel Portföy & Canlı TL/USD Değerleme</h1>
+                        <p class="page-sub">Varlıklarınızı girin; sistem canlı Dolar/TL kuru ile anlık toplam portföy değerinizi ve kâr/zarar oranınızı hesaplasın.</p>
+                    </div>
+                </div>
+
+                <div class="control-strip">
+                    <div class="input-col"><span class="input-lbl">SEMBOL (NVDA, THYAO.IS, GC=F)</span><input type="text" id="pSym" class="mono" placeholder="THYAO.IS" style="width:150px;"></div>
+                    <div class="input-col"><span class="input-lbl">ADET / MİKTAR</span><input type="number" id="pQty" class="mono" value="100" style="width:110px;"></div>
+                    <div class="input-col"><span class="input-lbl">ORT. MALİYET</span><input type="number" id="pCost" class="mono" value="285" style="width:120px;"></div>
+                    <div class="input-col">
+                        <span class="input-lbl">PARA BİRİMİ</span>
+                        <select id="pCurr" class="mono"><option value="TRY">TRY (₺)</option><option value="USD">USD ($)</option></select>
+                    </div>
+                    <button class="btn-dark mono" onclick="addPortfolioAsset()">VARLIK EKLE</button>
+                    <button class="btn-outline mono" onclick="evaluatePortfolio()">DEĞERLEMEYİ GÜNCELLE</button>
+                </div>
+
+                <div class="kpi-grid mono" id="portKpis"></div>
+
+                <div class="white-card">
+                    <div class="card-top mono"><span>PORTFÖY VARLIK LİSTESİ (TARAYICIDA KAYITLI)</span></div>
+                    <div style="overflow-x:auto;">
+                        <table class="mono">
+                            <thead><tr><th>VARLIK</th><th>ADET</th><th>MALİYET</th><th>GÜNCEL FİYAT</th><th>DEĞER (₺)</th><th>DEĞER ($)</th><th>KÂR / ZARAR</th><th>İŞLEM</th></tr></thead>
+                            <tbody id="portTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 03. ALGO TRADING BOT SİMÜLATÖRÜ -->
+            <section id="tab-bot" class="tab-section">
+                <div class="page-head">
+                    <div>
+                        <h1 class="page-title" id="h_bot">Algoritmik Alım-Satım Strateji Botu (Paper Trading)</h1>
+                        <p class="page-sub">RSI ve EMA(20) kurallarınıza göre sanal sermaye ile geçmiş piyasa verisinde otomatik al-sat simülasyonu çalıştırın.</p>
+                    </div>
+                </div>
+
+                <div class="control-strip">
+                    <div class="input-col"><span class="input-lbl">HEDEF VARLIK</span><input type="text" id="botTicker" class="mono" value="NVDA" style="width:130px;"></div>
+                    <div class="input-col"><span class="input-lbl">BAŞLANGIÇ BAKİYE ($)</span><input type="number" id="botCash" class="mono" value="10000" style="width:130px;"></div>
+                    <div class="input-col"><span class="input-lbl">ALIM RSI EŞİĞİ (&lt;)</span><input type="number" id="botBuyRsi" class="mono" value="38" style="width:110px;"></div>
+                    <div class="input-col"><span class="input-lbl">SATIM RSI EŞİĞİ (&gt;)</span><input type="number" id="botSellRsi" class="mono" value="72" style="width:110px;"></div>
+                    <div class="input-col">
+                        <span class="input-lbl">TEST SÜRESİ</span>
+                        <select id="botPeriod" class="mono"><option value="6mo">6 AY</option><option value="1y" selected>1 YIL</option><option value="2y">2 YIL</option></select>
+                    </div>
+                    <button class="btn-dark mono" onclick="runBotSimulation()">BOTU ÇALIŞTIR</button>
+                </div>
+
+                <div class="kpi-grid mono" id="botKpis"></div>
+
+                <div class="grid-2">
+                    <div class="white-card">
+                        <div class="card-top mono"><span>BOT SERMAYE EĞRİSİ ($)</span></div>
+                        <canvas id="botChart" height="145"></canvas>
+                    </div>
+                    <div class="white-card">
+                        <div class="card-top mono"><span>SON ALIM-SATIM EMİR GÜNLÜĞÜ</span></div>
+                        <div style="max-height:310px; overflow-y:auto;">
+                            <table class="mono">
+                                <thead><tr><th>TARİH</th><th>YÖN</th><th>FİYAT</th><th>RSI</th><th>TUTAR</th></tr></thead>
+                                <tbody id="botTrades"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 04. TEKNİK SİNYAL TARAYICI -->
+            <section id="tab-screener" class="tab-section">
+                <div class="page-head">
+                    <div>
+                        <h1 class="page-title" id="h_scr">Çoklu Varlık Kantitatif Sinyal Tarayıcı</h1>
+                        <p class="page-sub">BIST 100 ve ABD hisseleri için canlı RSI(14), MACD histogramı, 20 günlük momentum ve volatilite taraması.</p>
+                    </div>
+                </div>
+                <div class="control-strip">
+                    <div class="input-col" style="flex:1; min-width:280px;">
+                        <span class="input-lbl">İZLEME LİSTESİ</span>
+                        <input type="text" id="screenerTickers" class="mono" value="THYAO.IS, TUPRS.IS, KCHOL.IS, ASELS.IS, NVDA, AAPL, MSFT, GLD, BTC-USD">
+                    </div>
+                    <button class="btn-dark mono" onclick="runScreener()">SİNYALLERİ TARA</button>
+                </div>
+                <div class="white-card">
+                    <div class="card-top mono"><span>CANLI TEKNİK TARAMA MATRİSİ</span><span id="scrTime">HAZIR</span></div>
+                    <div style="overflow-x:auto;">
+                        <table class="mono">
+                            <thead><tr><th>SEMBOL</th><th>SON FİYAT</th><th>GÜNLÜK</th><th>20G MOM</th><th>RSI (14)</th><th>MACD HIST</th><th>VOLATİLİTE</th><th>SİNYAL</th></tr></thead>
+                            <tbody id="screenerTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 05. MARKOWITZ OPTİMİZASYON -->
+            <section id="tab-markowitz" class="tab-section">
+                <div class="page-head">
+                    <div>
+                        <h1 class="page-title" id="h_mk">Markowitz Etkin Sınır & Korelasyon Isı Haritası</h1>
+                        <p class="page-sub">4.000 portföy dağılımı simülasyonu ile Maksimum Sharpe ve Minimum Risk ağırlıkları.</p>
+                    </div>
+                </div>
+                <div class="control-strip">
+                    <div class="input-col" style="min-width:280px;"><span class="input-lbl">PORTFÖY VARLIKLARI</span><input type="text" id="mkTickers" class="mono" value="NVDA, SPY, GLD, BTC-USD"></div>
+                    <div class="input-col">
+                        <span class="input-lbl">HAZIR SEPETLER</span>
+                        <select id="mkPreset" class="mono" onchange="document.getElementById('mkTickers').value=this.value; runMarkowitz();">
+                            <option value="NVDA, SPY, GLD, BTC-USD">Global Makro</option>
+                            <option value="THYAO.IS, TUPRS.IS, KCHOL.IS, ASELS.IS">BIST 30 Seçici</option>
+                            <option value="NVDA, AAPL, MSFT, GOOGL">ABD Teknoloji</option>
+                        </select>
+                    </div>
+                    <div class="input-col"><span class="input-lbl">RİSKSİZ FAİZ (%)</span><input type="number" id="mkRf" class="mono" value="4.25" step="0.25" style="width:110px;"></div>
+                    <button class="btn-dark mono" onclick="runMarkowitz()">ETKİN SINIRI HESAPLA</button>
+                </div>
+                <div class="kpi-grid mono" id="mkKpis"></div>
+                <div class="grid-2">
+                    <div class="white-card"><div class="card-top mono"><span>ETKİN SINIR (RİSK vs GETİRİ)</span></div><canvas id="efChart" height="150"></canvas></div>
+                    <div class="white-card">
+                        <div class="card-top mono"><span>OPTİMAL SERMAYE DAĞILIMI</span></div><div id="mkWeights" style="margin-bottom:16px;"></div>
+                        <div class="card-top mono"><span>KORELASYON ISI HARİTASI</span></div><div id="mkCorr"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 06. BACKTEST & VaR -->
+            <section id="tab-backtest" class="tab-section">
+                <div class="page-head">
+                    <div>
+                        <h1 class="page-title" id="h_bt">Tarihsel Portföy Backtest & VaR Risk Motoru</h1>
+                        <p class="page-sub">Kümülatif getiri eğrisi, Sharpe/Sortino/Calmar oranları ve %95 Riske Maruz Değer (VaR / CVaR).</p>
+                    </div>
+                </div>
+                <div class="control-strip">
+                    <div class="input-col" style="min-width:300px;"><span class="input-lbl">AĞIRLIKLAR</span><input type="text" id="btWeights" class="mono" value="NVDA:0.35, SPY:0.35, GLD:0.20, BTC-USD:0.10"></div>
+                    <div class="input-col"><span class="input-lbl">BENCHMARK</span><select id="btBench" class="mono"><option value="SPY">S&P 500</option><option value="QQQ">NASDAQ 100</option><option value="XU100.IS">BIST 100</option></select></div>
+                    <div class="input-col"><span class="input-lbl">DÖNEM</span><select id="btPeriod" class="mono"><option value="1y">1Y</option><option value="3y" selected>3Y</option><option value="5y">5Y</option></select></div>
+                    <button class="btn-dark mono" onclick="runBacktest()">BACKTEST ÇALIŞTIR</button>
+                </div>
+                <div class="kpi-grid mono" id="btKpis"></div>
+                <div class="grid-2">
+                    <div class="white-card"><div class="card-top mono"><span>PORTFÖY BÜYÜMESİ ($10K)</span></div><canvas id="btEqChart" height="145"></canvas></div>
+                    <div class="white-card"><div class="card-top mono"><span>DRAWDOWN (%)</span></div><canvas id="btDdChart" height="145"></canvas></div>
+                </div>
+            </section>
+
+            <!-- 07. MONTE CARLO -->
+            <section id="tab-montecarlo" class="tab-section">
+                <div class="page-head">
+                    <div>
+                        <h1 class="page-title" id="h_mc">Stokastik Monte Carlo Servet Simülasyonu (GBM)</h1>
+                        <p class="page-sub">500 senaryo altında nominal büyüme ve enflasyon arındırılmış reel alım gücü.</p>
+                    </div>
+                </div>
+                <div class="control-strip">
+                    <div class="input-col"><span class="input-lbl">BAŞLANGIÇ</span><input type="number" id="mcCap" class="mono" value="100000" style="width:130px;"></div>
+                    <div class="input-col"><span class="input-lbl">AYLIK EKLEME</span><input type="number" id="mcPmt" class="mono" value="5000" style="width:120px;"></div>
+                    <div class="input-col"><span class="input-lbl">GETİRİ (%)</span><input type="number" id="mcMu" class="mono" value="42" style="width:105px;"></div>
+                    <div class="input-col"><span class="input-lbl">ENFLASYON (%)</span><input type="number" id="mcInf" class="mono" value="28" style="width:105px;"></div>
+                    <div class="input-col"><span class="input-lbl">VOLATİLİTE (%)</span><input type="number" id="mcSig" class="mono" value="24" style="width:105px;"></div>
+                    <div class="input-col"><span class="input-lbl">YIL</span><input type="number" id="mcYrs" class="mono" value="5" style="width:75px;"></div>
+                    <button class="btn-dark mono" onclick="runMonteCarlo()">SİMÜLE ET</button>
+                </div>
+                <div class="kpi-grid mono" id="mcKpis"></div>
+                <div class="white-card"><div class="card-top mono"><span>SERVET KONİSİ (NOMİNAL vs REEL)</span></div><canvas id="mcChart" height="100"></canvas></div>
+            </section>
+
+            <!-- 08. GRAFİKLİ HESAP STÜDYOSU -->
+            <section id="tab-calculators" class="tab-section">
+                <div class="page-head">
+                    <div>
+                        <h1 class="page-title" id="h_calc">Görsel Finansal Hesaplama Stüdyosu</h1>
+                        <p class="page-sub">6 farklı finansal aracın her biri anlık sonuçlarla birlikte canlı grafik üretir.</p>
+                    </div>
+                </div>
+                <div class="grid-calc">
+                    <div class="white-card">
+                        <div class="card-top mono"><span>01 // VADELİ MEVDUAT & STOPAJ</span></div>
+                        <div class="calc-inputs">
+                            <div class="input-col"><span class="input-lbl">ANAPARA</span><input type="number" id="c1_p" class="mono" value="250000" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">FAİZ (%)</span><input type="number" id="c1_r" class="mono" value="48" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">GÜN</span><input type="number" id="c1_d" class="mono" value="32" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">STOPAJ (%)</span><input type="number" id="c1_t" class="mono" value="10" oninput="calcAll()"></div>
+                        </div>
+                        <div class="calc-summary mono" id="c1_res"></div>
+                        <div class="calc-chart-wrap"><canvas id="chartC1"></canvas></div>
+                    </div>
+
+                    <div class="white-card">
+                        <div class="card-top mono"><span>02 // ENFLASYON & FISHER REEL GETİRİ</span></div>
+                        <div class="calc-inputs">
+                            <div class="input-col"><span class="input-lbl">NOMİNAL (%)</span><input type="number" id="c2_n" class="mono" value="55" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">ENFLASYON (%)</span><input type="number" id="c2_i" class="mono" value="38" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">TUTAR</span><input type="number" id="c2_a" class="mono" value="100000" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">YIL</span><input type="number" id="c2_y" class="mono" value="3" oninput="calcAll()"></div>
+                        </div>
+                        <div class="calc-summary mono" id="c2_res"></div>
+                        <div class="calc-chart-wrap"><canvas id="chartC2"></canvas></div>
+                    </div>
+
+                    <div class="white-card">
+                        <div class="card-top mono"><span>03 // KREDİ TAKSİT & MALİYET</span></div>
+                        <div class="calc-inputs">
+                            <div class="input-col"><span class="input-lbl">KREDİ TUTARI</span><input type="number" id="c3_l" class="mono" value="500000" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">AYLIK FAİZ (%)</span><input type="number" id="c3_r" class="mono" value="3.49" step="0.1" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">AY</span><input type="number" id="c3_m" class="mono" value="24" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">VERGİ (%)</span><input type="number" id="c3_t" class="mono" value="30" oninput="calcAll()"></div>
+                        </div>
+                        <div class="calc-summary mono" id="c3_res"></div>
+                        <div class="calc-chart-wrap"><canvas id="chartC3"></canvas></div>
+                    </div>
+
+                    <div class="white-card">
+                        <div class="card-top mono"><span>04 // BİLEŞİK GETİRİ & BİRİKİM</span></div>
+                        <div class="calc-inputs">
+                            <div class="input-col"><span class="input-lbl">BAŞLANGIÇ</span><input type="number" id="c4_i" class="mono" value="25000" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">AYLIK EKLEME</span><input type="number" id="c4_p" class="mono" value="2500" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">GETİRİ (%)</span><input type="number" id="c4_r" class="mono" value="24" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">YIL</span><input type="number" id="c4_y" class="mono" value="10" oninput="calcAll()"></div>
+                        </div>
+                        <div class="calc-summary mono" id="c4_res"></div>
+                        <div class="calc-chart-wrap"><canvas id="chartC4"></canvas></div>
+                    </div>
+
+                    <div class="white-card">
+                        <div class="card-top mono"><span>05 // FİNANSAL ÖZGÜRLÜK (FIRE)</span></div>
+                        <div class="calc-inputs">
+                            <div class="input-col"><span class="input-lbl">AYLIK GİDER</span><input type="number" id="c5_e" class="mono" value="3000" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">ÇEKİM (%)</span><input type="number" id="c5_s" class="mono" value="4.0" step="0.2" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">MEVCUT BİRİKİM</span><input type="number" id="c5_c" class="mono" value="50000" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">AYLIK TASARRUF</span><input type="number" id="c5_v" class="mono" value="1500" oninput="calcAll()"></div>
+                        </div>
+                        <div class="calc-summary mono" id="c5_res"></div>
+                        <div class="calc-chart-wrap"><canvas id="chartC5"></canvas></div>
+                    </div>
+
+                    <div class="white-card">
+                        <div class="card-top mono"><span>06 // BLACK-SCHOLES & KELLY KRİTERİ</span></div>
+                        <div class="calc-inputs">
+                            <div class="input-col"><span class="input-lbl">SPOT (S)</span><input type="number" id="c6_s" class="mono" value="140" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">STRIKE (K)</span><input type="number" id="c6_k" class="mono" value="145" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">VOLATİLİTE (%)</span><input type="number" id="c6_v" class="mono" value="35" oninput="calcAll()"></div>
+                            <div class="input-col"><span class="input-lbl">KAZANMA (%)</span><input type="number" id="c6_w" class="mono" value="58" oninput="calcAll()"></div>
+                        </div>
+                        <div class="calc-summary mono" id="c6_res"></div>
+                        <div class="calc-chart-wrap"><canvas id="chartC6"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 09. SEC 10-K & KAP RAG AI -->
+            <section id="tab-rag" class="tab-section">
+                <div class="page-head">
+                    <div>
+                        <h1 class="page-title" id="h_rag">SEC 10-K & KAP Kaynaklı Yapay Zeka Analisti</h1>
+                        <p class="page-sub">Resmi bilanço ve faaliyet raporları üzerinde kanıtlı soru-cevap ve canlı yeni 10-K indeksleme.</p>
+                    </div>
+                </div>
+                <div class="control-strip">
+                    <div class="input-col">
+                        <span class="input-lbl">ŞİRKET</span>
+                        <select id="ragTicker" class="mono"><option value="NVDA">NVDA</option><option value="MSFT">MSFT</option><option value="AAPL">AAPL</option><option value="TSLA">TSLA</option></select>
+                    </div>
+                    <button class="btn-outline mono" onclick="ingestNew10K()" id="btnIngest">YENİ 10-K ÇEK & İNDEKSLE</button>
+                </div>
+                <div class="white-card">
+                    <div class="card-top mono"><span>KAYNAKLI SORGU (SIFIR HALÜSİNASYON)</span><span id="ragTel">HAZIR</span></div>
+                    <textarea id="ragQ" rows="2" class="mono" style="width:100%;">How much was the charge associated with H20 excess inventory and purchase obligations in fiscal year 2026?</textarea>
+                    <div style="margin-top:12px;"><button class="btn-dark mono" onclick="askRagAI()">ANALİZİ ÇALIŞTIR</button></div>
+                    <div id="ragOut" class="ai-box mono">Sorgu çalıştırmak için butona basın.</div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        const API_BASE = (window.location.hostname.includes("localhost") || window.location.hostname === "127.0.0.1")
+            ? ""
+            : "https://inertia-quantai.onrender.com";
+
+        let currentLang = "tr";
+        let charts = {};
+        let loadedTabs = { "tab-markets": true };
+        let reportState = {};
+
+        const I18N = {
+            tr: {
+                brand_sub: "KURUMSAL KANTİTATİF TERMİNAL",
+                grp1: "CANLI PİYASA & PORTFÖY", grp2: "KANTİTATİF RİSK MOTORU", grp3: "STÜDYO & YAPAY ZEKA",
+                n1: "01. TR & Global Piyasalar", n2: "02. Portföyüm & Alarm", n3: "03. Algo Trading Botu", n4: "04. Sinyal Tarayıcı",
+                n5: "05. Markowitz Optimizasyon", n6: "06. Backtest & VaR Risk", n7: "07. Monte Carlo Simülasyon",
+                n8: "08. Grafikli Hesap Stüdyosu", n9: "09. SEC 10-K & KAP AI",
+                h_mkt: "Canlı Türkiye & Global Piyasalar Kokpiti",
+                s_mkt: "Dolar/TL, Euro/TL, Gram Altın, BIST 100, Emtia ve Kripto verileri — Kartlara tıklayarak teknik grafiği inceleyin.",
+                h_port: "Kişisel Portföy & Canlı TL/USD Değerleme",
+                h_bot: "Algoritmik Alım-Satım Strateji Botu (Paper Trading)",
+                h_scr: "Çoklu Varlık Kantitatif Sinyal Tarayıcı",
+                h_mk: "Markowitz Etkin Sınır & Korelasyon Isı Haritası",
+                h_bt: "Tarihsel Portföy Backtest & VaR Risk Motoru",
+                h_mc: "Stokastik Monte Carlo Servet Simülasyonu (GBM)",
+                h_calc: "Görsel Finansal Hesaplama Stüdyosu",
+                h_rag: "SEC 10-K & KAP Kaynaklı Yapay Zeka Analisti"
+            },
+            en: {
+                brand_sub: "INSTITUTIONAL QUANTITATIVE TERMINAL",
+                grp1: "LIVE MARKETS & PORTFOLIO", grp2: "QUANTITATIVE RISK ENGINE", grp3: "STUDIO & AI ANALYST",
+                n1: "01. TR & Global Markets", n2: "02. My Portfolio & Alerts", n3: "03. Algo Trading Bot", n4: "04. Signal Screener",
+                n5: "05. Markowitz Optimizer", n6: "06. Backtest & VaR Risk", n7: "07. Monte Carlo GBM",
+                n8: "08. Visual Calc Studio", n9: "09. SEC 10-K & KAP AI",
+                h_mkt: "Live Turkey & Global Markets Cockpit",
+                s_mkt: "Real-time USD/TRY, EUR/TRY, Gram Gold, BIST 100 & Crypto — Click any card to inspect Bollinger & RSI.",
+                h_port: "Personal Portfolio & Live TRY/USD Valuation",
+                h_bot: "Algorithmic Trading Strategy Simulator (Paper Trading)",
+                h_scr: "Multi-Asset Quantitative Signal Screener",
+                h_mk: "Markowitz Efficient Frontier & Correlation Heatmap",
+                h_bt: "Historical Portfolio Backtest & VaR Risk Engine",
+                h_mc: "Stochastic Monte Carlo Wealth Simulation (GBM)",
+                h_calc: "Visual Financial Calculator Studio",
+                h_rag: "SEC 10-K & KAP Grounded AI Research Analyst"
+            },
+            de: {
+                brand_sub: "INSTITUTIONELLES QUANT-TERMINAL",
+                grp1: "LIVE-MÄRKTE & PORTFOLIO", grp2: "QUANT-RISIKOMOTOR", grp3: "STUDIO & KI-ANALYST",
+                n1: "01. TR & Globale Märkte", n2: "02. Mein Portfolio", n3: "03. Algo-Trading-Bot", n4: "04. Signal-Scanner",
+                n5: "05. Markowitz-Optimierer", n6: "06. Backtest & VaR-Risiko", n7: "07. Monte Carlo GBM",
+                n8: "08. Visueller Finanzrechner", n9: "09. SEC 10-K & KAP KI",
+                h_mkt: "Live Türkei & Globale Märkte Cockpit",
+                s_mkt: "Echtzeit USD/TRY, EUR/TRY, Gramm Gold, BIST 100 & Krypto — Klicken Sie auf eine Karte für Charts.",
+                h_port: "Persönliches Portfolio & Live TRY/USD Bewertung",
+                h_bot: "Algorithmischer Trading-Strategie-Simulator",
+                h_scr: "Multi-Asset Quantitativer Signal-Scanner",
+                h_mk: "Markowitz Effizienzgrenze & Korrelations-Heatmap",
+                h_bt: "Historischer Portfolio-Backtest & VaR-Risiko",
+                h_mc: "Stochastische Monte-Carlo-Simulation (GBM)",
+                h_calc: "Visuelles Finanzrechner-Studio",
+                h_rag: "SEC 10-K & KAP KI-Finanzanalyst"
+            }
+        };
+
+        function switchLang(l, btn) {
+            currentLang = l;
+            document.querySelectorAll(".lang-opt").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            const d = I18N[l];
+            document.getElementById("ui_brand_sub").innerText = d.brand_sub;
+            document.getElementById("ui_grp1").innerText = d.grp1;
+            document.getElementById("ui_grp2").innerText = d.grp2;
+            document.getElementById("ui_grp3").innerText = d.grp3;
+            for (let i = 1; i <= 9; i++) {
+                document.getElementById(`nav_${i}`).children[0].innerText = d[`n${i}`];
+            }
+            document.getElementById("h_mkt").innerText = d.h_mkt;
+            document.getElementById("s_mkt").innerText = d.s_mkt;
+            document.getElementById("h_port").innerText = d.h_port;
+            document.getElementById("h_bot").innerText = d.h_bot;
+            document.getElementById("h_scr").innerText = d.h_scr;
+            document.getElementById("h_mk").innerText = d.h_mk;
+            document.getElementById("h_bt").innerText = d.h_bt;
+            document.getElementById("h_mc").innerText = d.h_mc;
+            document.getElementById("h_calc").innerText = d.h_calc;
+            document.getElementById("h_rag").innerText = d.h_rag;
+        }
+
+        function destroyChart(id) { if (charts[id]) charts[id].destroy(); }
+
+        function openTab(tabId, btn) {
+            document.querySelectorAll(".tab-section").forEach(s => s.classList.remove("active"));
+            document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+            if (btn) btn.classList.add("active");
+
+            if (!loadedTabs[tabId]) {
+                loadedTabs[tabId] = true;
+                if (tabId === "tab-portfolio") evaluatePortfolio();
+                if (tabId === "tab-bot") runBotSimulation();
+                if (tabId === "tab-screener") runScreener();
+                if (tabId === "tab-markowitz") runMarkowitz();
+                if (tabId === "tab-backtest") runBacktest();
+            }
+        }
+
+        function renderMarketData(data) {
+            document.getElementById("regimeText").innerText = `VIX ${data.vix} // ${data.regime}`;
+            document.getElementById("engineStatus").innerText = `DURUM: AKTİF (${data.timestamp})`;
+
+            document.getElementById("topTape").innerHTML = `<span class="t-item"><span class="pulse-dot"></span><b>CANLI</b></span>` +
+                data.markets.map(m => {
+                    const cls = m.change_pct >= 0 ? "up-txt" : "down-txt";
+                    const sign = m.change_pct >= 0 ? "+" : "";
+                    return `<span class="t-item"><b>${m.name}</b> ${m.prefix}${m.price.toLocaleString()} <span class="${cls}">${sign}${m.change_pct}%</span></span>`;
+                }).join("");
+
+            document.getElementById("liveMarketCards").innerHTML = data.markets.map(m => {
+                const cls = m.change_pct >= 0 ? "m-chg-pos" : "m-chg-neg";
+                const sign = m.change_pct >= 0 ? "+" : "";
+                const clickSym = m.symbol === "GAUTRY" ? "GC=F" : m.symbol;
+                return `
+                    <div class="m-card" onclick="document.getElementById('chartSymbol').value='${clickSym}'; loadTechChart();">
+                        <div class="m-card-head"><span>${m.name}</span><span class="m-cat">${m.category}</span></div>
+                        <div class="m-price">${m.prefix}${m.price.toLocaleString()}</div>
+                        <div class="${cls}">${sign}${m.change_pct}% (24s)</div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        async function loadLiveMarkets(force = false) {
+            try {
+                const res = await fetch(`${API_BASE}/api/markets/tr-live?refresh=${force}`);
+                if (res.ok) renderMarketData(await res.json());
+            } catch (e) {}
+        }
+
+        function startLiveSocket() {
+            const wsProto = window.location.protocol === "https:" ? "wss:" : "ws:";
+            const wsHost = API_BASE ? "inertia-quantai.onrender.com" : window.location.host;
+            try {
+                const ws = new WebSocket(`${wsProto}//${wsHost}/ws/live`);
+                ws.onmessage = (ev) => renderMarketData(JSON.parse(ev.data));
+            } catch (e) {}
+        }
+
+        async function loadTechChart() {
+            const sym = document.getElementById("chartSymbol").value.trim() || "TRY=X";
+            const period = document.getElementById("chartPeriod").value;
+            document.getElementById("techChartTitle").innerText = `${sym.toUpperCase()} // FİYAT & BOLLINGER BANTLARI`;
+            try {
+                const res = await fetch(`${API_BASE}/api/chart/${encodeURIComponent(sym)}?period=${period}`);
+                if (!res.ok) return;
+                const d = await res.json();
+                destroyChart("priceTech");
+                charts["priceTech"] = new Chart(document.getElementById("priceTechChart"), {
+                    type: "line",
+                    data: {
+                        labels: d.dates,
+                        datasets: [
+                            { label: "Fiyat", data: d.close, borderColor: "#0F172A", borderWidth: 2.2, pointRadius: 0 },
+                            { label: "SMA 20", data: d.sma20, borderColor: "#D97706", borderWidth: 1.4, borderDash: [4, 4], pointRadius: 0 },
+                            { label: "Üst Bant", data: d.bb_upper, borderColor: "#94A3B8", borderWidth: 1, pointRadius: 0 },
+                            { label: "Alt Bant", data: d.bb_lower, borderColor: "#94A3B8", borderWidth: 1, backgroundColor: "rgba(148,163,184,0.12)", fill: "-1", pointRadius: 0 }
+                        ]
+                    },
+                    options: { responsive: true, scales: { x: { ticks: { maxTicksLimit: 7 } } } }
+                });
+                destroyChart("rsiTech");
+                charts["rsiTech"] = new Chart(document.getElementById("rsiTechChart"), {
+                    type: "line",
+                    data: { labels: d.dates, datasets: [{ label: "RSI (14)", data: d.rsi, borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.1)", fill: true, borderWidth: 1.8, pointRadius: 0 }] },
+                    options: { responsive: true, scales: { x: { ticks: { maxTicksLimit: 7 } }, y: { min: 0, max: 100 } } }
+                });
+            } catch (e) {}
+        }
+
+        let myPortfolio = JSON.parse(localStorage.getItem("iq_portfolio") || '[{"ticker":"THYAO.IS","qty":100,"avg_cost":280,"currency":"TRY"},{"ticker":"NVDA","qty":15,"avg_cost":115,"currency":"USD"}]');
+
+        function addPortfolioAsset() {
+            const ticker = document.getElementById("pSym").value.toUpperCase().trim();
+            const qty = parseFloat(document.getElementById("pQty").value) || 0;
+            const avg_cost = parseFloat(document.getElementById("pCost").value) || 0;
+            const currency = document.getElementById("pCurr").value;
+            if (!ticker || qty <= 0) return;
+            myPortfolio.push({ ticker, qty, avg_cost, currency });
+            localStorage.setItem("iq_portfolio", JSON.stringify(myPortfolio));
+            document.getElementById("pSym").value = "";
+            evaluatePortfolio();
+        }
+
+        function removePortfolioAsset(idx) {
+            myPortfolio.splice(idx, 1);
+            localStorage.setItem("iq_portfolio", JSON.stringify(myPortfolio));
+            evaluatePortfolio();
+        }
+
+        async function evaluatePortfolio() {
+            try {
+                const res = await fetch(`${API_BASE}/api/portfolio/evaluate`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ items: myPortfolio })
+                });
+                if (!res.ok) return;
+                const d = await res.json();
+                reportState.portfolio = d;
+
+                document.getElementById("portKpis").innerHTML = `
+                    <div class="white-card"><div class="kpi-lbl">TOPLAM PORTFÖY (₺)</div><div class="kpi-val">₺${d.total_try.toLocaleString()}</div><div class="kpi-sub">Kur: ₺${d.usd_try}</div></div>
+                    <div class="white-card"><div class="kpi-lbl">TOPLAM PORTFÖY ($)</div><div class="kpi-val">$${d.total_usd.toLocaleString()}</div><div class="kpi-sub">Dolar Bazlı Net Değer</div></div>
+                    <div class="white-card"><div class="kpi-lbl">NET KÂR / ZARAR ($)</div><div class="kpi-val" style="color:${d.pnl_usd>=0?'var(--accent-emerald)':'var(--accent-crimson)'};">${d.pnl_usd>=0?'+':''}$${d.pnl_usd.toLocaleString()}</div><div class="kpi-sub">₺${d.pnl_try.toLocaleString()}</div></div>
+                    <div class="white-card"><div class="kpi-lbl">TOPLAM GETİRİ (%)</div><div class="kpi-val" style="color:${d.pnl_pct>=0?'var(--accent-emerald)':'var(--accent-crimson)'};">${d.pnl_pct>=0?'+':''}%${d.pnl_pct}</div><div class="kpi-sub">${d.rows.length} Varlık</div></div>
+                `;
+
+                document.getElementById("portTable").innerHTML = d.rows.map((r, i) => `
+                    <tr>
+                        <td><b>${r.ticker}</b></td>
+                        <td>${r.qty}</td>
+                        <td>${r.avg_cost} ${r.currency}</td>
+                        <td><b>${r.spot} ${r.currency}</b></td>
+                        <td>₺${r.val_try.toLocaleString()}</td>
+                        <td>$${r.val_usd.toLocaleString()}</td>
+                        <td class="${r.pnl_pct>=0?'up-txt':'down-txt'}">${r.pnl_pct>=0?'+':''}%${r.pnl_pct}</td>
+                        <td><button class="btn-outline" style="padding:3px 8px; font-size:0.7rem;" onclick="removePortfolioAsset(${i})">SİL</button></td>
+                    </tr>
+                `).join("");
+            } catch (e) {}
+        }
+
+        async function runBotSimulation() {
+            const ticker = document.getElementById("botTicker").value.trim() || "NVDA";
+            const initial_cash = parseFloat(document.getElementById("botCash").value) || 10000;
+            const rsi_buy = parseFloat(document.getElementById("botBuyRsi").value) || 38;
+            const rsi_sell = parseFloat(document.getElementById("botSellRsi").value) || 72;
+            const period = document.getElementById("botPeriod").value;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/bot/simulate`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ticker, period, initial_cash, rsi_buy, rsi_sell })
+                });
+                if (!res.ok) return;
+                const d = await res.json();
+                reportState.bot = d;
+
+                document.getElementById("botKpis").innerHTML = `
+                    <div class="white-card"><div class="kpi-lbl">BOT SON BAKİYE</div><div class="kpi-val" style="color:var(--accent-emerald);">$${d.final_equity.toLocaleString()}</div><div class="kpi-sub">Başlangıç: $${d.initial_cash.toLocaleString()}</div></div>
+                    <div class="white-card"><div class="kpi-lbl">ALGO BOT GETİRİSİ</div><div class="kpi-val">${d.bot_return_pct>=0?'+':''}%${d.bot_return_pct}</div><div class="kpi-sub">Al & Tut: %${d.buy_hold_pct}</div></div>
+                    <div class="white-card"><div class="kpi-lbl">TOPLAM İŞLEM SAYISI</div><div class="kpi-val">${d.trade_count}</div><div class="kpi-sub">Otomatik Emir</div></div>
+                    <div class="white-card"><div class="kpi-lbl">STRATEJİ FARKI (ALPHA)</div><div class="kpi-val">${(d.bot_return_pct - d.buy_hold_pct).toFixed(2)}%</div><div class="kpi-sub">Benchmark Farkı</div></div>
+                `;
+
+                document.getElementById("botTrades").innerHTML = d.trades.map(t => `
+                    <tr>
+                        <td>${t.date}</td>
+                        <td><span class="${t.side.includes('AL')?'pill-buy':'pill-sell'}">${t.side}</span></td>
+                        <td>$${t.price}</td>
+                        <td>${t.rsi}</td>
+                        <td>$${t.value.toLocaleString()}</td>
+                    </tr>
+                `).join("");
+
+                destroyChart("bot");
+                charts["bot"] = new Chart(document.getElementById("botChart"), {
+                    type: "line",
+                    data: { labels: d.dates, datasets: [{ label: `${d.ticker} Bot Sermayesi ($)`, data: d.equity, borderColor: "#059669", backgroundColor: "rgba(5,150,105,0.1)", fill: true, borderWidth: 2, pointRadius: 0 }] },
+                    options: { responsive: true, scales: { x: { ticks: { maxTicksLimit: 7 } } } }
+                });
+            } catch (e) {}
+        }
+
+        async function runScreener() {
+            const tickers = document.getElementById("screenerTickers").value.split(",").map(s => s.trim()).filter(Boolean);
+            const tbody = document.getElementById("screenerTable");
+            tbody.innerHTML = `<tr><td colspan="8">Taranıyor...</td></tr>`;
+            try {
+                const res = await fetch(`${API_BASE}/api/screener`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tickers })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById("scrTime").innerText = `GÜNCELLENDİ: ${new Date().toLocaleTimeString()}`;
+                    tbody.innerHTML = data.signals.map(s => {
+                        const pill = s.signal.includes("AL") || s.signal === "BİRİKTİR" ? "pill-buy" : (s.signal === "AZALT" ? "pill-sell" : "pill-neu");
+                        return `<tr><td><b>${s.ticker}</b></td><td>${s.price.toLocaleString()}</td><td class="${s.change_1d>=0?'up-txt':'down-txt'}">${s.change_1d>=0?'+':''}${s.change_1d}%</td><td class="${s.ret_20d>=0?'up-txt':'down-txt'}">${s.ret_20d>=0?'+':''}${s.ret_20d}%</td><td>${s.rsi}</td><td>${s.macd_hist}</td><td>%${s.volatility}</td><td><span class="${pill}">${s.signal}</span></td></tr>`;
+                    }).join("");
+                }
+            } catch (e) {}
+        }
+
+        async function runMarkowitz() {
+            const tickers = document.getElementById("mkTickers").value.split(",").map(s => s.trim()).filter(Boolean);
+            const rf = parseFloat(document.getElementById("mkRf").value) || 4.25;
+            try {
+                const res = await fetch(`${API_BASE}/api/optimize`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tickers, period: "2y", risk_free_rate: rf, simulations: 4000 })
+                });
+                if (!res.ok) return;
+                const d = await res.json();
+                reportState.markowitz = d;
+                document.getElementById("mkKpis").innerHTML = `
+                    <div class="white-card"><div class="kpi-lbl">MAX SHARPE</div><div class="kpi-val">${d.max_sharpe.sharpe}</div></div>
+                    <div class="white-card"><div class="kpi-lbl">BEKLENEN GETİRİ</div><div class="kpi-val" style="color:var(--accent-emerald);">%${d.max_sharpe.return_pct}</div></div>
+                    <div class="white-card"><div class="kpi-lbl">VOLATİLİTE</div><div class="kpi-val">%${d.max_sharpe.vol_pct}</div></div>
+                    <div class="white-card"><div class="kpi-lbl">MİN RİSK SHARPE</div><div class="kpi-val">${d.min_vol.sharpe}</div></div>
+                `;
+                document.getElementById("mkWeights").innerHTML = `<table class="mono"><thead><tr><th>VARLIK</th><th>MAX SHARPE %</th><th>MIN RİSK %</th></tr></thead><tbody>` +
+                    d.tickers.map(t => `<tr><td><b>${t}</b></td><td><b>%${d.max_sharpe.weights[t]}</b></td><td>%${d.min_vol.weights[t]}</td></tr>`).join("") + `</tbody></table>`;
+                document.getElementById("mkCorr").innerHTML = `<table class="mono"><thead><tr><th>KORR</th>${d.tickers.map(t => `<th>${t}</th>`).join("")}</tr></thead><tbody>` +
+                    d.tickers.map((t, i) => `<tr><td><b>${t}</b></td>${d.correlation[i].map(v => `<td style="background:${v>0.6?'rgba(5,150,105,0.16)':(v<0?'rgba(220,38,38,0.14)':'transparent')};">${v.toFixed(2)}</td>`).join("")}</tr>`).join("") + `</tbody></table>`;
+                destroyChart("ef");
+                charts["ef"] = new Chart(document.getElementById("efChart"), {
+                    type: "scatter",
+                    data: {
+                        datasets: [
+                            { label: "Simülasyonlar", data: d.scatter, backgroundColor: "rgba(15, 23, 42, 0.2)", pointRadius: 2.5 },
+                            { label: "Max Sharpe", data: [{ x: d.max_sharpe.vol_pct, y: d.max_sharpe.return_pct }], backgroundColor: "#059669", pointRadius: 8 },
+                            { label: "Min Risk", data: [{ x: d.min_vol.vol_pct, y: d.min_vol.return_pct }], backgroundColor: "#D97706", pointRadius: 7 }
+                        ]
+                    },
+                    options: { responsive: true }
+                });
+            } catch (e) {}
+        }
+
+        async function runBacktest() {
+            const weights = {};
+            document.getElementById("btWeights").value.split(",").forEach(p => {
+                const [k, v] = p.split(":");
+                if (k && v && !isNaN(parseFloat(v))) weights[k.trim()] = parseFloat(v);
+            });
+            const bench = document.getElementById("btBench").value;
+            const period = document.getElementById("btPeriod").value;
+            try {
+                const res = await fetch(`${API_BASE}/api/backtest`, {
+                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ weights, benchmark: bench, period, initial_capital: 10000, rebalance_monthly: true })
+                });
+                if (!res.ok) return;
+                const d = await res.json();
+                const m = d.metrics, s = d.series;
+                reportState.backtest = m;
+                document.getElementById("btKpis").innerHTML = `
+                    <div class="white-card"><div class="kpi-lbl">DÖNEM SONU ($10K)</div><div class="kpi-val" style="color:var(--accent-emerald);">$${m.final_value.toLocaleString()}</div><div class="kpi-sub">${bench}: $${m.bench_final_value.toLocaleString()}</div></div>
+                    <div class="white-card"><div class="kpi-lbl">CAGR</div><div class="kpi-val">%${m.cagr}</div><div class="kpi-sub">Bench: %${m.bench_cagr}</div></div>
+                    <div class="white-card"><div class="kpi-lbl">SHARPE / SORTINO</div><div class="kpi-val">${m.sharpe} / ${m.sortino}</div></div>
+                    <div class="white-card"><div class="kpi-lbl">VaR (%95) / MAX DD</div><div class="kpi-val" style="color:var(--accent-crimson);">%${m.var_95} / %${m.max_dd}</div></div>
+                `;
+                destroyChart("btEq");
+                charts["btEq"] = new Chart(document.getElementById("btEqChart"), {
+                    type: "line",
+                    data: { labels: s.dates, datasets: [{ label: "Portföy ($)", data: s.portfolio, borderColor: "#0F172A", fill: true, backgroundColor: "rgba(15,23,42,0.06)", borderWidth: 2, pointRadius: 0 }, { label: bench, data: s.benchmark, borderColor: "#94A3B8", borderDash: [4,4], borderWidth: 1.5, pointRadius: 0 }] },
+                    options: { responsive: true, scales: { x: { ticks: { maxTicksLimit: 7 } } } }
+                });
+                destroyChart("btDd");
+                charts["btDd"] = new Chart(document.getElementById("btDdChart"), {
+                    type: "line",
+                    data: { labels: s.dates, datasets: [{ label: "Drawdown (%)", data: s.drawdown, borderColor: "#DC2626", fill: true, backgroundColor: "rgba(220,38,38,0.12)", borderWidth: 1.6, pointRadius: 0 }] },
+                    options: { responsive: true, scales: { x: { ticks: { maxTicksLimit: 7 } } } }
+                });
+            } catch (e) {}
+        }
+
+        function randn() {
+            let u = 0, v = 0;
+            while (u === 0) u = Math.random();
+            while (v === 0) v = Math.random();
+            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        }
+
+        function runMonteCarlo() {
+            const P0 = parseFloat(document.getElementById("mcCap").value) || 100000;
+            const PMT = parseFloat(document.getElementById("mcPmt").value) || 0;
+            const mu = (parseFloat(document.getElementById("mcMu").value) || 42) / 100;
+            const inf = (parseFloat(document.getElementById("mcInf").value) || 28) / 100;
+            const sig = (parseFloat(document.getElementById("mcSig").value) || 24) / 100;
+            const yrs = parseInt(document.getElementById("mcYrs").value) || 5;
+            const months = yrs * 12, dt = 1 / 12, sims = 500, paths = [];
+            for (let s = 0; s < sims; s++) {
+                let v = P0, arr = [v];
+                for (let m = 1; m <= months; m++) {
+                    v = (v + PMT) * Math.exp((mu - 0.5 * sig * sig) * dt + sig * Math.sqrt(dt) * randn());
+                    arr.push(v);
+                }
+                paths.push(arr);
+            }
+            const labels = [], p10 = [], p50 = [], p90 = [], realP50 = [];
+            for (let m = 0; m <= months; m++) {
+                labels.push(m % 12 === 0 ? `${m / 12}Y` : "");
+                const slice = paths.map(p => p[m]).sort((a, b) => a - b);
+                const med = slice[Math.floor(sims * 0.5)];
+                p10.push(Math.round(slice[Math.floor(sims * 0.1)]));
+                p50.push(Math.round(med));
+                p90.push(Math.round(slice[Math.floor(sims * 0.9)]));
+                realP50.push(Math.round(med / Math.pow(1 + inf, m / 12)));
+            }
+            document.getElementById("mcKpis").innerHTML = `
+                <div class="white-card"><div class="kpi-lbl">P10 KÖTÜMSER</div><div class="kpi-val">${p10[months].toLocaleString()}</div></div>
+                <div class="white-card"><div class="kpi-lbl">P50 MEDYAN NOMİNAL</div><div class="kpi-val">${p50[months].toLocaleString()}</div></div>
+                <div class="white-card"><div class="kpi-lbl">REEL ALIM GÜCÜ</div><div class="kpi-val" style="color:var(--accent-emerald);">${realP50[months].toLocaleString()}</div></div>
+                <div class="white-card"><div class="kpi-lbl">P90 İYİMSER</div><div class="kpi-val">${p90[months].toLocaleString()}</div></div>
+            `;
+            destroyChart("mc");
+            charts["mc"] = new Chart(document.getElementById("mcChart"), {
+                type: "line",
+                data: {
+                    labels,
+                    datasets: [
+                        { label: "P90", data: p90, borderColor: "#94A3B8", borderWidth: 1.4, pointRadius: 0 },
+                        { label: "P50 Nominal", data: p50, borderColor: "#0F172A", borderWidth: 2.5, pointRadius: 0 },
+                        { label: "Reel Değer", data: realP50, borderColor: "#059669", borderDash: [5, 4], borderWidth: 2.2, pointRadius: 0 },
+                        { label: "P10", data: p10, borderColor: "#DC2626", borderWidth: 1.3, pointRadius: 0 }
+                    ]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        function normCDF(x) {
+            const t = 1 / (1 + 0.2316419 * Math.abs(x));
+            const d = 0.3989423 * Math.exp(-x * x / 2);
+            let prob = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+            return x > 0 ? 1 - prob : prob;
+        }
+
+        function calcAll() {
+            const P1 = parseFloat(document.getElementById("c1_p").value) || 0;
+            const r1 = (parseFloat(document.getElementById("c1_r").value) || 0) / 100;
+            const d1 = parseFloat(document.getElementById("c1_d").value) || 0;
+            const t1 = (parseFloat(document.getElementById("c1_t").value) || 0) / 100;
+            const gross1 = P1 * r1 * (d1 / 365), tax1 = gross1 * t1, net1 = gross1 - tax1;
+            document.getElementById("c1_res").innerHTML = `Brüt: ${gross1.toLocaleString(undefined,{maximumFractionDigits:2})} | Stopaj: -${tax1.toLocaleString(undefined,{maximumFractionDigits:2})}<br><strong>Net Kazanç: +${net1.toLocaleString(undefined,{maximumFractionDigits:2})}</strong> | Toplam: <strong>${(P1+net1).toLocaleString(undefined,{maximumFractionDigits:2})}</strong>`;
+            destroyChart("c1");
+            charts["c1"] = new Chart(document.getElementById("chartC1"), { type: "doughnut", data: { labels: ["Anapara", "Net Kazanç", "Stopaj"], datasets: [{ data: [P1, Math.max(0, net1), Math.max(0, tax1)], backgroundColor: ["#0F172A", "#059669", "#DC2626"] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right" } } } });
+
+            const nom2 = (parseFloat(document.getElementById("c2_n").value) || 0) / 100, inf2 = (parseFloat(document.getElementById("c2_i").value) || 0) / 100, amt2 = parseFloat(document.getElementById("c2_a").value) || 0, yrs2 = parseFloat(document.getElementById("c2_y").value) || 1;
+            const realR2 = ((1 + nom2) / (1 + inf2)) - 1, nomFut2 = amt2 * Math.pow(1 + nom2, yrs2), realFut2 = amt2 * Math.pow(1 + realR2, yrs2);
+            document.getElementById("c2_res").innerHTML = `Fisher Reel Oran: <strong>%${(realR2*100).toFixed(2)}</strong><br>Nominal: ${nomFut2.toLocaleString(undefined,{maximumFractionDigits:0})} | <strong>Reel Güç: ${realFut2.toLocaleString(undefined,{maximumFractionDigits:0})}</strong>`;
+            destroyChart("c2");
+            charts["c2"] = new Chart(document.getElementById("chartC2"), { type: "bar", data: { labels: ["Başlangıç", "Nominal", "Reel"], datasets: [{ data: [amt2, Math.round(nomFut2), Math.round(realFut2)], backgroundColor: ["#94A3B8", "#0F172A", realR2>=0?"#059669":"#DC2626"] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+
+            const L3 = parseFloat(document.getElementById("c3_l").value) || 0, br3 = (parseFloat(document.getElementById("c3_r").value) || 0) / 100, m3 = parseFloat(document.getElementById("c3_m").value) || 1, tx3 = 1 + ((parseFloat(document.getElementById("c3_t").value) || 0) / 100);
+            const eff3 = br3 * tx3, pmt3 = eff3 > 0 ? (L3 * eff3 * Math.pow(1 + eff3, m3)) / (Math.pow(1 + eff3, m3) - 1) : (L3 / m3), tot3 = pmt3 * m3, intCost3 = Math.max(0, tot3 - L3);
+            document.getElementById("c3_res").innerHTML = `<strong>Aylık Taksit: ${pmt3.toLocaleString(undefined,{maximumFractionDigits:2})}</strong><br>Toplam Geri Ödeme: <strong>${tot3.toLocaleString(undefined,{maximumFractionDigits:0})}</strong>`;
+            destroyChart("c3");
+            charts["c3"] = new Chart(document.getElementById("chartC3"), { type: "doughnut", data: { labels: ["Anapara", "Faiz + Vergi"], datasets: [{ data: [L3, intCost3], backgroundColor: ["#0F172A", "#D97706"] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right" } } } });
+
+            const P4 = parseFloat(document.getElementById("c4_i").value) || 0, PMT4 = parseFloat(document.getElementById("c4_p").value) || 0, r4 = (parseFloat(document.getElementById("c4_r").value) || 0) / 100, y4 = Math.min(40, Math.max(1, parseInt(document.getElementById("c4_y").value) || 1));
+            const lbl4 = [], balArr4 = [], prinArr4 = []; let bal4 = P4;
+            for (let yr = 1; yr <= y4; yr++) {
+                for (let m = 0; m < 12; m++) bal4 = (bal4 + PMT4) * (1 + r4 / 12);
+                lbl4.push(`${yr}Y`); balArr4.push(Math.round(bal4)); prinArr4.push(Math.round(P4 + PMT4 * 12 * yr));
+            }
+            const totPrin4 = P4 + PMT4 * 12 * y4;
+            document.getElementById("c4_res").innerHTML = `Anapara: ${totPrin4.toLocaleString()} | <strong>Toplam Portföy: ${Math.round(bal4).toLocaleString()}</strong>`;
+            destroyChart("c4");
+            charts["c4"] = new Chart(document.getElementById("chartC4"), { type: "line", data: { labels: lbl4, datasets: [{ label: "Portföy", data: balArr4, borderColor: "#059669", fill: true, backgroundColor: "rgba(5,150,105,0.12)", borderWidth: 2 }, { label: "Anapara", data: prinArr4, borderColor: "#0F172A", borderDash: [4,4], borderWidth: 1.5 }] }, options: { responsive: true, maintainAspectRatio: false } });
+
+            const exp5 = parseFloat(document.getElementById("c5_e").value) || 0, swr5 = (parseFloat(document.getElementById("c5_s").value) || 4) / 100, cur5 = parseFloat(document.getElementById("c5_c").value) || 0, sav5 = parseFloat(document.getElementById("c5_v").value) || 0;
+            const target5 = swr5 > 0 ? (exp5 * 12) / swr5 : 0; let b5 = cur5, m5 = 0;
+            while (b5 < target5 && m5 < 600 && sav5 > 0) { b5 = (b5 + sav5) * (1 + 0.08 / 12); m5++; }
+            document.getElementById("c5_res").innerHTML = `Hedef FIRE: <strong>${Math.round(target5).toLocaleString()}</strong> | Kalan Süre: <strong>${(m5/12).toFixed(1)} Yıl</strong>`;
+            destroyChart("c5");
+            charts["c5"] = new Chart(document.getElementById("chartC5"), { type: "bar", data: { labels: ["FIRE"], datasets: [{ label: "Mevcut", data: [cur5], backgroundColor: "#059669" }, { label: "Kalan", data: [Math.max(0, target5 - cur5)], backgroundColor: "#CBD5E1" }] }, options: { indexAxis: "y", responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } } });
+
+            const S6 = parseFloat(document.getElementById("c6_s").value) || 100, K6 = parseFloat(document.getElementById("c6_k").value) || 100, v6 = (parseFloat(document.getElementById("c6_v").value) || 30) / 100, w6 = (parseFloat(document.getElementById("c6_w").value) || 55) / 100;
+            const T6 = 0.25, rf6 = 0.0425;
+            const bs_d1 = (Math.log(S6 / K6) + (rf6 + 0.5 * v6 * v6) * T6) / (v6 * Math.sqrt(T6));
+            const bs_d2 = bs_d1 - v6 * Math.sqrt(T6);
+            const call6 = S6 * normCDF(bs_d1) - K6 * Math.exp(-rf6 * T6) * normCDF(bs_d2);
+            const put6 = call6 - S6 + K6 * Math.exp(-rf6 * T6);
+            const kelly6 = Math.max(0, (w6 - ((1 - w6) / 1.5)) * 100);
+            document.getElementById("c6_res").innerHTML = `3A Call: <strong>${call6.toFixed(2)}</strong> | Put: <strong>${put6.toFixed(2)}</strong><br>Kelly Pozisyon: <strong>%${kelly6.toFixed(1)}</strong>`;
+            const spots = [0.8, 0.9, 0.95, 1.0, 1.05, 1.1, 1.2].map(m => Math.round(K6 * m));
+            destroyChart("c6");
+            charts["c6"] = new Chart(document.getElementById("chartC6"), { type: "line", data: { labels: spots, datasets: [{ label: "Call Payoff", data: spots.map(sp => +(Math.max(0, sp - K6) - call6).toFixed(2)), borderColor: "#0F172A", fill: true, backgroundColor: "rgba(15,23,42,0.08)", borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false } });
+        }
+
+        async function askRagAI() {
+            const ticker = document.getElementById("ragTicker").value;
+            const question = document.getElementById("ragQ").value.trim();
+            const out = document.getElementById("ragOut");
+            out.innerText = `${ticker} resmi SEC 10-K vektörleri taranıyor...`;
+            try {
+                const res = await fetch(`${API_BASE}/api/sec-ai/ask`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ticker, question, top_k: 5 }) });
+                if (res.ok) {
+                    const data = await res.json();
+                    out.innerText = data.answer;
+                    reportState.rag = { ticker, question, answer: data.answer };
+                }
+            } catch (e) { out.innerText = "Bağlantı hatası."; }
+        }
+
+        async function ingestNew10K() {
+            const ticker = document.getElementById("ragTicker").value;
+            const btn = document.getElementById("btnIngest");
+            btn.innerText = `${ticker} İNDİRİLİYOR...`;
+            try {
+                const res = await fetch(`${API_BASE}/api/sec-ai/ingest/${ticker}`, { method: "POST" });
+                btn.innerText = res.ok ? "İNDEKSLENDİ" : "HATA";
+            } catch (e) { btn.innerText = "HATA"; }
+        }
+
+        function exportFullReport() {
+            const md = `# INERTIA QUANT // EXECUTIVE RESEARCH REPORT (${currentLang.toUpperCase()})\nDate: ${new Date().toISOString().slice(0,10)}\n\n## 1. Personal Portfolio Summary\n${JSON.stringify(reportState.portfolio || {}, null, 2)}\n\n## 2. Algo Bot Simulation\n${JSON.stringify(reportState.bot || {}, null, 2)}\n\n## 3. Backtest & Risk Metrics\n${JSON.stringify(reportState.backtest || {}, null, 2)}\n\n## 4. SEC 10-K AI Findings\n${reportState.rag ? reportState.rag.answer : "No query executed."}`;
+            const blob = new Blob([md], { type: "text/markdown;charset=utf-8;" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `Inertia_Quant_Report_${new Date().toISOString().slice(0,10)}.md`;
+            a.click();
+        }
+
+        loadLiveMarkets();
+        startLiveSocket();
+        loadTechChart();
+        runMonteCarlo();
+        calcAll();
+    </script>
+</body>
+</html>
